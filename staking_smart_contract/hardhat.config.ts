@@ -30,6 +30,15 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    rinkeby: {
+      url:
+        process.env.ROPSTEN_URL ||
+        "https://rinkeby.infura.io/v3/2a0466dbf35b4b1f8e210f257f4ffca2",
+      accounts: [
+        "0xd62d9e6d34cc818dc48c97b1f4779028430a4136d4add0c6dec64191159f6c25",
+      ],
+      // process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

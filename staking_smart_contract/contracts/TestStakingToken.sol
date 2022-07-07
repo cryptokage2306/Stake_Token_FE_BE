@@ -5,12 +5,18 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
 /**
  * @title Test Staking Token (STK)
  * @author Vivek Jain
  * @notice Implements a basic ERC20 staking token with incentive distribution.
  */
-contract StakingToken is ERC20("Test Staking Token", "T-STK"), Ownable {
+contract TestStakingToken is
+    ERC20("Test Staking Token", "T-STK"),
+    Ownable,
+    ReentrancyGuard
+{
     using SafeMath for uint256;
 
     /**
@@ -43,7 +49,7 @@ contract StakingToken is ERC20("Test Staking Token", "T-STK"), Ownable {
      * @notice A method for a stakeholder to create a stake.
      * @param _stake The size of the stake to be created.
      */
-    function createStake(uint256 _stake) public {
+    function createStake(uint256 _stake) nonReentrant public {
         _burn(msg.sender, _stake);
         if (stakes[msg.sender] == 0) addStakeholder(msg.sender);
         stakes[msg.sender] = stakes[msg.sender].add(_stake);
