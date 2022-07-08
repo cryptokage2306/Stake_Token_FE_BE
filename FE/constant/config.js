@@ -1,1 +1,1 @@
-export const MODULE = "data";
+export const LIMIT = 50;

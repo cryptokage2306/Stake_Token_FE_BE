@@ -1,11 +1,14 @@
 import { ethers } from "ethers";
 import Head from "next/head";
-import { useEffect, useContext, useState, useCallback } from "react";
+import { useEffect, useContext, useState, useCallback, useMemo } from "react";
 import {
   ConnectWalletContext,
   useStakingContract,
 } from "../components/context/connectWallet.context";
 import { Input } from "../components/Input";
+import Table from "../components/Table";
+import apiProvider from "../provider/api";
+import { useTable } from "react-table";
 
 export default function Home() {
   const { connected, address: account } = useContext(ConnectWalletContext);
@@ -15,6 +18,7 @@ export default function Home() {
   const [balanceOf, setBalanceOf] = useState("0");
   const [symbol, setSymbol] = useState("");
   const [staked, setStaked] = useState("0");
+  const [tableData, setTableData] = useState([]);
   const stakingContract = useStakingContract();
   useEffect(async () => {
     if (connected && account) {
@@ -35,10 +39,16 @@ export default function Home() {
       }
     }
   }, [amount, account, connected]);
+  const getRecord = async () => {
+    setTableData(await apiProvider.getRecords());
+  };
+
+  useEffect(() => {
+    getRecord();
+  }, []);
 
   const handleSubmit = useCallback(async () => {
     try {
-      console.log(ethers.utils.parseEther(amount).toString());
       if (!alreadyApproved) {
         const tx = await stakingContract.approve(
           process.env.NEXT_PUBLIC_STAKING_TOKEN_ADDRESS,
@@ -59,6 +69,28 @@ export default function Home() {
     }
   }, [amount, alreadyApproved, error]);
 
+  const columns = useMemo(
+    () => [
+      {
+        Header: "TxHash",
+        accessor: "transactionHash",
+      },
+      {
+        Header: "staker",
+        accessor: "from",
+      },
+      {
+        Header: "BlockNumber",
+        accessor: "blockNumber",
+      },
+      {
+        Header: "Amount",
+        accessor: "amount",
+      },
+    ],
+    []
+  );
+
   return (
     <div>
       <Head>
@@ -67,39 +99,44 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex justify-center items-center flex-col h-screen">
-        <div className="">
-          <div>
-            Balance: {ethers.utils.formatEther(balanceOf).toString()} {symbol}
-          </div>
-          <div>
-            Staked: {ethers.utils.formatEther(staked).toString()} {symbol}
-          </div>
+        <div>
+          <Table columns={columns} data={tableData} />
         </div>
-        {error ? (
-          <>
-            {error}
+        <div>
+          <div className="">
             <div>
-              <button onClick={() => setError("")}>Reset App</button>
+              Balance: {ethers.utils.formatEther(balanceOf).toString()} {symbol}
             </div>
-          </>
-        ) : connected ? (
-          <>
-            <Input
-            className="m-5"
-              type="number"
-              onChange={(e) => setAmount(e.target.value)}
-              value={amount}
-            />
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleSubmit}
-            >
-              Stake
-            </button>
-          </>
-        ) : (
-          "Please connect with Wallet before staking"
-        )}
+            <div>
+              Staked: {ethers.utils.formatEther(staked).toString()} {symbol}
+            </div>
+          </div>
+          {error ? (
+            <>
+              {error}
+              <div>
+                <button onClick={() => setError("")}>Reset App</button>
+              </div>
+            </>
+          ) : connected ? (
+            <>
+              <Input
+                className="m-5"
+                type="number"
+                onChange={(e) => setAmount(e.target.value)}
+                value={amount}
+              />
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleSubmit}
+              >
+                Stake
+              </button>
+            </>
+          ) : (
+            "Please connect with Wallet before staking"
+          )}
+        </div>
       </main>
     </div>
   );
