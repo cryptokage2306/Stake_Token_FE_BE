@@ -1,14 +1,28 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useCallback } from "react";
 import { ConnectWalletContext } from "../context/connectWallet.context";
 
 export default function Header() {
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const { web3, provider } = useContext(ConnectWalletContext);
+  const {
+    connectWallet,
+    connected,
+    address: account,
+  } = useContext(ConnectWalletContext);
+
+  const buttonRender = useCallback(
+    () => (
+      <button onClick={connectWallet}>
+        {connected ? account : "Connect Wallet"}
+      </button>
+    ),
+    [connected, account]
+  );
 
   return (
     <div className="flex items-center justify-between border-b border-gray-400 py-8">
       <a href="/">
-        <img src="https://designbygio.it/images/logo.png" alt="logo" />
+        Root
+        {/* <img src="https://designbygio.it/images/logo.png" alt="logo" /> */}
       </a>
       <nav>
         <section className="MOBILE-MENU flex lg:hidden">
@@ -41,28 +55,14 @@ export default function Header() {
             </div>
             <ul className="flex flex-col items-center justify-between min-h-[250px]">
               <li className="border-b border-gray-400 my-8 uppercase">
-                <a href="/about">About</a>
-              </li>
-              <li className="border-b border-gray-400 my-8 uppercase">
-                <a href="/portfolio">Portfolio</a>
-              </li>
-              <li className="border-b border-gray-400 my-8 uppercase">
-                <a href="/contact">Contact</a>
+                {buttonRender()}
               </li>
             </ul>
           </div>
         </section>
 
         <ul className="DESKTOP-MENU hidden space-x-8 lg:flex">
-          <li>
-            <a href="/about">About</a>
-          </li>
-          <li>
-            <a href="/portfolio">Portfolio</a>
-          </li>
-          <li>
-            <a href="/contact">Contact</a>
-          </li>
+          <li>{buttonRender()}</li>
         </ul>
       </nav>
       <style>{`

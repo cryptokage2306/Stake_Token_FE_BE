@@ -14,7 +14,7 @@ import {
 } from "../../utils/web3Utils";
 import Web3Modal from "web3modal";
 import { ethers } from "ethers";
-import { abi as stakingTokenABI } from "../../constant";
+import { STAKING_TOKEN } from "../../constant";
 const ConnectWalletContext = createContext();
 
 export { ConnectWalletContext };
@@ -110,8 +110,12 @@ export const ConnectWalletProvider = ({ children }) => {
 
 export const useStakingContract = () => {
   const { signer } = useContext(ConnectWalletContext);
-  return useMemo(
-    () => new ethers.Contract(process.env.STAKING_TOKEN_ADDRESS, stakingTokenABI, signer),
-    [address]
-  );
+  return useMemo(() => {
+    if (!signer) return null;
+    return new ethers.Contract(
+      "0x2fa337efDE18cDA62af20eD9ECBD4181CD41c1e3",
+      STAKING_TOKEN.abi,
+      signer
+    );
+  }, [signer]);
 };
