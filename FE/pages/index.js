@@ -95,7 +95,7 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Next Tailwind Hardhat Template</title>
+        <title>Stake T-STK Token</title>
         <meta name="description" content="template" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
