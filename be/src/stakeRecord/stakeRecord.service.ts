@@ -4,6 +4,7 @@ import { StakeRecord } from '../entity/stakeRecord.entity';
 import { Repository } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { constants, Contract, providers } from 'ethers';
+import { from as fromPromise } from 'rxjs';
 
 @Injectable()
 export class StakeRecordService {
@@ -14,7 +15,8 @@ export class StakeRecordService {
   getHello(): string {
     return 'Hello World!';
   }
-  async _createTask({
+
+  _createTask({
     amount,
     from,
     blockNumber,
@@ -30,20 +32,16 @@ export class StakeRecordService {
     record.from = from;
     record.blockNumber = blockNumber;
     record.transactionHash = transactionHash;
-    return this.stakeRepository.save(record);
+    return fromPromise(this.stakeRepository.save(record));
   }
 
-  async getRecords({
-    skip,
-    limit,
-  }: {
-    skip?: number;
-    limit?: number;
-  }): Promise<StakeRecord[]> {
-    return this.stakeRepository.find({
-      skip,
-      take: limit,
-    });
+  getRecords({ skip, limit }: { skip?: number; limit?: number }) {
+    return fromPromise(
+      this.stakeRepository.find({
+        skip,
+        take: limit,
+      }),
+    );
   }
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -61,9 +59,9 @@ export class StakeRecordService {
       abi,
       web3Provider,
     );
-    contract.on('Transfer', async (from, to, value, event) => {
+    contract.on('Transfer', (from, to, value, event) => {
       if (to === constants.AddressZero) {
-        await this._createTask({
+        this._createTask({
           from,
           amount: value,
           blockNumber: event.blockNumber,

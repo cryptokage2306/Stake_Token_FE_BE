@@ -1,5 +1,6 @@
 import React from "react";
+import {Input as RSInput} from 'reactstrap'
 
 export const Input = (props) => {
-  return <input className="border-2 rounded" {...props} />;
+  return <RSInput {...props} className="w-50" />;
 };

@@ -1,4 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
+import { Observable } from 'rxjs';
 import { StakeRecord } from 'src/entity/stakeRecord.entity';
 import { StakeRecordService } from './stakeRecord.service';
 
@@ -12,9 +13,9 @@ export class StakeRecordController {
   }
 
   @Get('/records')
-  async getRecords(
+  getRecords(
     @Query() { skip, limit }: { skip?: number; limit?: number },
-  ): Promise<StakeRecord[]> {
+  ): Observable<StakeRecord[]> {
     return this.stakeRecordService.getRecords({
       limit,
       skip,

@@ -8,7 +8,8 @@ import {
 import { Input } from "../components/Input";
 import Table from "../components/Table";
 import apiProvider from "../provider/api";
-import { useTable } from "react-table";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Button, Col, Row } from "reactstrap";
 
 export default function Home() {
   const { connected, address: account } = useContext(ConnectWalletContext);
@@ -98,45 +99,48 @@ export default function Home() {
         <meta name="description" content="template" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex justify-center items-center flex-col h-screen">
-        <div>
-          <Table columns={columns} data={tableData} />
-        </div>
-        <div>
-          <div className="">
-            <div>
-              Balance: {ethers.utils.formatEther(balanceOf).toString()} {symbol}
+      <main>
+        <Row>
+          <Col xs="12 mt-5">
+            <div className="d-flex justify-content-center text-center">
+              <Table columns={columns} data={tableData} />{" "}
             </div>
-            <div>
-              Staked: {ethers.utils.formatEther(staked).toString()} {symbol}
-            </div>
-          </div>
-          {error ? (
-            <>
-              {error}
+          </Col>
+          <Col xs="12">
+            <div className="text-center mt-5">
               <div>
-                <button onClick={() => setError("")}>Reset App</button>
+                Balance: {ethers.utils.formatEther(balanceOf).toString()}{" "}
+                {symbol}
               </div>
-            </>
-          ) : connected ? (
-            <>
-              <Input
-                className="m-5"
-                type="number"
-                onChange={(e) => setAmount(e.target.value)}
-                value={amount}
-              />
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleSubmit}
-              >
-                Stake
-              </button>
-            </>
-          ) : (
-            "Please connect with Wallet before staking"
-          )}
-        </div>
+              <div>
+                Staked: {ethers.utils.formatEther(staked).toString()} {symbol}
+              </div>
+              <div>
+                {error ? (
+                  <div>
+                    {error}
+                    <div>
+                      <button onClick={() => setError("")}>Reset App</button>
+                    </div>
+                  </div>
+                ) : connected ? (
+                  <div className="d-flex justify-content-center mt-3">
+                    <Input
+                      type="number"
+                      onChange={(e) => setAmount(e.target.value)}
+                      value={amount}
+                    />
+                    <Button color="primary" onClick={handleSubmit}>
+                      Stake
+                    </Button>
+                  </div>
+                ) : (
+                  "Please connect with Wallet before staking"
+                )}
+              </div>
+            </div>
+          </Col>
+        </Row>
       </main>
     </div>
   );
